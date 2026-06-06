@@ -1,247 +1,314 @@
-local UIS = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
-local CoreGui = game:GetService("CoreGui")
-
+-- =======================================================
+-- [PROJECT-X / VOID UI LIBRARY v3.0 - EXCLUSIVE EDITION]
+-- 包含：专属 X 徽标、全局动画、通知阵列、全套UI组件
+-- =======================================================
 local Library = {}
 
--- 核心配色方案（紫灰）
-local Theme = {
-    Background = Color3.fromRGB(25, 22, 30),     -- 深暗灰紫
-    NavBg = Color3.fromRGB(35, 30, 42),          -- 导航暗紫
-    Accent = Color3.fromRGB(157, 78, 221),       -- 霓虹亮紫
-    Text = Color3.fromRGB(240, 240, 240),         -- 主文本白
-    SubText = Color3.fromRGB(150, 140, 160),      -- 次要灰紫文本
-    Border = Color3.fromRGB(50, 44, 60),          -- 边框暗灰
-}
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 
-function Library:CreateWindow(titleText)
-    local Window = {}
-    
-    -- 1. 创建外壳保护
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "PurpleGray_Lib_" .. math.random(100,999)
-    ScreenGui.Parent = CoreGui
-    ScreenGui.ResetOnSpawn = false
-    
-    -- 2. 主框架 (Main Frame)
-    local MainFrame = Instance.new("Frame")
-    MainFrame.Name = "MainFrame"
-    local defaultSize = UDim2.new(0, 450, 0, 300) -- 记住默认大小用于缩放
-    MainFrame.Size = defaultSize
-    MainFrame.Position = UDim2.new(0.5, -225, 0.5, -150)
-    MainFrame.BackgroundColor3 = Theme.Background
-    MainFrame.BorderSizePixel = 1
-    MainFrame.BorderColor3 = Theme.Border
-    MainFrame.Parent = ScreenGui
-    
-    local UICorner = Instance.new("UICorner")
-    UICorner.CornerRadius = UDim.new(0, 8)
-    UICorner.Parent = MainFrame
-    
-    -- 3. 顶部标题栏
-    local TopBar = Instance.new("Frame")
-    TopBar.Name = "TopBar"
-    TopBar.Size = UDim2.new(1, 0, 0, 40)
-    TopBar.BackgroundColor3 = Theme.NavBg
-    TopBar.Parent = MainFrame
-    
-    local TopCorner = Instance.new("UICorner")
-    TopCorner.CornerRadius = UDim.new(0, 8)
-    TopCorner.Parent = TopBar
-    
-    local Title = Instance.new("TextLabel")
-    Title.Size = UDim2.new(1, -95, 1, 0)
-    Title.Position = UDim2.new(0, 15, 0, 0)
-    Title.Text = titleText or "紫色科技脚本"
-    Title.TextColor3 = Theme.Text
-    Title.TextSize = 16
-    Title.Font = Enum.Font.SourceSansBold
-    Title.TextXAlignment = Enum.TextXAlignment.Left
-    Title.BackgroundTransparency = 1
-    Title.Parent = TopBar
-    
-    -- 4. 内容滚动区域 (Container)
-    local Container = Instance.new("ScrollingFrame")
-    Container.Size = UDim2.new(1, -20, 1, -55)
-    Container.Position = UDim2.new(0, 10, 0, 45)
-    Container.BackgroundTransparency = 1
-    Container.BorderSizePixel = 0
-    Container.ScrollBarThickness = 4
-    Container.ScrollBarImageColor3 = Theme.Accent
-    Container.Parent = MainFrame
-    
-    local UIListLayout = Instance.new("UIListLayout")
-    UIListLayout.Padding = UDim.new(0, 8)
-    UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    UIListLayout.Parent = Container
-    
-    UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        Container.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y + 10)
-    end)
+-- 全局保护容器
+local UIContainer = Instance.new("ScreenGui")
+UIContainer.Name = "ProjectX_Interface"
+UIContainer.Parent = (gethui and gethui()) or CoreGui
+UIContainer.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-    -- =================【全自动防移出屏幕核心算法】=================
+-- ==========================================
+-- ❌ [独家组件] 纯代码绘制：赛博发光 X 徽标
+-- ==========================================
+local function CreateXLogo(parent, size, position)
+    local LogoContainer = Instance.new("Frame", parent)
+    LogoContainer.Size = size
+    LogoContainer.Position = position
+    LogoContainer.BackgroundTransparency = 1
+    LogoContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+
+    -- 左上到右下线条
+    local Line1 = Instance.new("Frame", LogoContainer)
+    Line1.Size = UDim2.new(1.2, 0, 0.15, 0)
+    Line1.Position = UDim2.new(0.5, 0, 0.5, 0)
+    Line1.AnchorPoint = Vector2.new(0.5, 0.5)
+    Line1.Rotation = 45
+    Line1.BackgroundColor3 = Color3.fromRGB(139, 92, 246) -- 赛博紫
+    Line1.BorderSizePixel = 0
+    local UIStroke1 = Instance.new("UIStroke", Line1)
+    UIStroke1.Color = Color3.fromRGB(167, 139, 250)
+    UIStroke1.Thickness = 1
+
+    -- 左下到右上线条
+    local Line2 = Instance.new("Frame", LogoContainer)
+    Line2.Size = UDim2.new(1.2, 0, 0.15, 0)
+    Line2.Position = UDim2.new(0.5, 0, 0.5, 0)
+    Line2.AnchorPoint = Vector2.new(0.5, 0.5)
+    Line2.Rotation = -45
+    Line2.BackgroundColor3 = Color3.fromRGB(236, 72, 153) -- 霓虹粉
+    Line2.BorderSizePixel = 0
+    local UIStroke2 = Instance.new("UIStroke", Line2)
+    UIStroke2.Color = Color3.fromRGB(244, 114, 182)
+    UIStroke2.Thickness = 1
     
-    -- 函数：强制将窗口卡在屏幕有效范围内
-    local function clampToScreen(targetPosition)
-        local screen = ScreenGui.AbsoluteSize
-        local frameSize = MainFrame.AbsoluteSize
+    return LogoContainer, Line1, Line2
+end
+
+-- ==========================================
+-- 🔔 [内置引擎] 右下角排队通知系统
+-- ==========================================
+local NotifArea = Instance.new("Frame", UIContainer)
+NotifArea.Size = UDim2.new(0, 300, 1, -50)
+NotifArea.Position = UDim2.new(1, -320, 0, 0)
+NotifArea.BackgroundTransparency = 1
+local ListLayout = Instance.new("UIListLayout", NotifArea)
+ListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+ListLayout.Padding = UDim.new(0, 10)
+
+local NotificationQueue = {}
+local isProcessingQueue = false
+
+local function ProcessQueue()
+    if isProcessingQueue then return end
+    isProcessingQueue = true
+    
+    while #NotificationQueue > 0 do
+        local msg = table.remove(NotificationQueue, 1)
         
-        -- 计算当前拖拽或缩放后的绝对坐标 X 和 Y
-        local targetX = targetPosition.X.Offset
-        local targetY = targetPosition.Y.Offset
+        local Toast = Instance.new("Frame", NotifArea)
+        Toast.Size = UDim2.new(1, 0, 0, 0)
+        Toast.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+        Toast.ClipsDescendants = true
+        Instance.new("UICorner", Toast).CornerRadius = UDim.new(0, 6)
         
-        -- 核心锁死逻辑：不能小于0（左/上边界），不能大于“屏幕宽/高减去窗口自身宽/高”（右/下边界）
-        local clampedX = math.clamp(targetX, 0, screen.X - frameSize.X)
-        local clampedY = math.clamp(targetY, 0, screen.Y - frameSize.Y)
+        local Accent = Instance.new("Frame", Toast)
+        Accent.Size = UDim2.new(0, 3, 1, 0)
+        Accent.BackgroundColor3 = Color3.fromRGB(139, 92, 246)
+
+        local Title = Instance.new("TextLabel", Toast)
+        Title.Size = UDim2.new(1, -20, 0, 25)
+        Title.Position = UDim2.new(0, 15, 0, 5)
+        Title.BackgroundTransparency = 1
+        Title.Text = msg.title
+        Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Title.Font = Enum.Font.GothamBold
+        Title.TextSize = 13
+        Title.TextXAlignment = Enum.TextXAlignment.Left
+
+        local Desc = Instance.new("TextLabel", Toast)
+        Desc.Size = UDim2.new(1, -20, 0, 25)
+        Desc.Position = UDim2.new(0, 15, 0, 25)
+        Desc.BackgroundTransparency = 1
+        Desc.Text = msg.desc
+        Desc.TextColor3 = Color3.fromRGB(161, 161, 170)
+        Desc.Font = Enum.Font.Code
+        Desc.TextSize = 12
+        Desc.TextXAlignment = Enum.TextXAlignment.Left
+
+        TweenService:Create(Toast, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, 60)}):Play()
+
+        task.spawn(function()
+            task.wait(6)
+            local closeTween = TweenService:Create(Toast, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {Size = UDim2.new(1, 0, 0, 0), BackgroundTransparency = 1})
+            closeTween:Play()
+            closeTween.Completed:Wait()
+            Toast:Destroy()
+        end)
         
-        return UDim2.new(0, clampedX, 0, clampedY)
+        task.wait(3) 
     end
+    isProcessingQueue = false
+end
 
-    -- 监听拖拽逻辑
+function Library:Notify(title, desc)
+    table.insert(NotificationQueue, {title = title, desc = desc})
+    task.spawn(ProcessQueue)
+end
+
+-- ==========================================
+-- ⏳ [API 导出] 专属 X 徽标加载开场动画
+-- ==========================================
+function Library:ShowLoading(text, duration)
+    local LoadFrame = Instance.new("Frame", UIContainer)
+    LoadFrame.Size = UDim2.new(1, 0, 1, 0) -- 全屏遮罩
+    LoadFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
+    LoadFrame.BackgroundTransparency = 1
+
+    -- 背景渐变变暗
+    TweenService:Create(LoadFrame, TweenInfo.new(0.5), {BackgroundTransparency = 0.2}):Play()
+
+    -- 创建中心徽标
+    local LogoCenter, L1, L2 = CreateXLogo(LoadFrame, UDim2.new(0, 0, 0, 0), UDim2.new(0.5, 0, 0.45, 0))
+    
+    local LoadText = Instance.new("TextLabel", LoadFrame)
+    LoadText.Size = UDim2.new(1, 0, 0, 30)
+    LoadText.Position = UDim2.new(0, 0, 0.55, 0)
+    LoadText.BackgroundTransparency = 1
+    LoadText.Text = text
+    LoadText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    LoadText.Font = Enum.Font.Code
+    LoadText.TextSize = 16
+    LoadText.TextTransparency = 1
+
+    -- X 爆发展开动画
+    TweenService:Create(LogoCenter, TweenInfo.new(1, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 80, 0, 80)}):Play()
+    TweenService:Create(LoadText, TweenInfo.new(1), {TextTransparency = 0}):Play()
+
+    -- X 徽标匀速旋转
+    local rotateTween = TweenService:Create(LogoCenter, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Rotation = 360})
+    rotateTween:Play()
+
+    task.wait(duration)
+
+    -- 收起动画
+    local hideTween = TweenService:Create(LogoCenter, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 0)})
+    TweenService:Create(LoadText, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
+    TweenService:Create(LoadFrame, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
+    
+    hideTween:Play()
+    hideTween.Completed:Wait()
+    LoadFrame:Destroy()
+end
+
+-- ==========================================
+-- 🪟 [API 导出] 创建极客风主控制面板
+-- ==========================================
+function Library:CreateWindow(titleText)
+    local WindowData = {}
+
+    -- 主框架
+    local MainFrame = Instance.new("Frame", UIContainer)
+    MainFrame.Size = UDim2.new(0, 600, 0, 380)
+    MainFrame.Position = UDim2.new(0.5, -300, 0.5, -190)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+    MainFrame.ClipsDescendants = true
+    Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
+    local Stroke = Instance.new("UIStroke", MainFrame)
+    Stroke.Color = Color3.fromRGB(40, 40, 48)
+
+    -- 顺滑拖拽逻辑
     local dragging, dragInput, dragStart, startPos
-    
-    TopBar.InputBegan:Connect(function(input)
+    MainFrame.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = MainFrame.Position
-            
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then dragging = false end
-            end)
+            dragging = true; dragStart = input.Position; startPos = MainFrame.Position
         end
     end)
-    
     MainFrame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then 
-            dragInput = input 
-        end
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragInput = input end
     end)
-    
-    UIS.InputChanged:Connect(function(input)
+    UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
             local delta = input.Position - dragStart
-            -- 尝试移动到的新位置
-            local tentativePos = UDim2.new(0, startPos.X.Offset + delta.X, 0, startPos.Y.Offset + delta.Y)
-            -- 经过安全过滤，强行卡在屏幕内
-            MainFrame.Position = clampToScreen(tentativePos)
+            TweenService:Create(MainFrame, TweenInfo.new(0.1), {Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)}):Play()
         end
     end)
-
-    -- =================【最小化与放大逻辑（带防飞出）】=================
-    
-    local isMinimized = false
-    
-    -- 最小化/折叠按钮
-    local MinimizeBtn = Instance.new("TextButton")
-    MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
-    MinimizeBtn.Position = UDim2.new(1, -65, 0, 5)
-    MinimizeBtn.Text = "-"
-    MinimizeBtn.TextColor3 = Theme.SubText
-    MinimizeBtn.TextSize = 20
-    MinimizeBtn.Font = Enum.Font.SourceSansBold
-    MinimizeBtn.BackgroundTransparency = 1
-    MinimizeBtn.Parent = TopBar
-    
-    MinimizeBtn.MouseButton1Click:Connect(function()
-        if not isMinimized then
-            -- 缩小：把高度变成 40 (只留顶部栏)，隐藏内容
-            isMinimized = true
-            MinimizeBtn.Text = "+"
-            Container.Visible = false
-            MainFrame.Size = UDim2.new(0, 450, 0, 40)
-            -- 缩小后也要做一次边界检查，防止手滑
-            MainFrame.Position = clampToScreen(MainFrame.Position)
-        else
-            -- 放大恢复：恢复默认大小
-            isMinimized = false
-            MinimizeBtn.Text = "-"
-            MainFrame.Size = defaultSize
-            Container.Visible = true
-            -- 【核心】放大的一瞬间立刻触发卡死算法，如果因为放大导致右边或底部溢出屏幕，自动吸附弹回
-            MainFrame.Position = clampToScreen(MainFrame.Position)
-        end
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end
     end)
 
-    -- 关闭按钮
-    local CloseBtn = Instance.new("TextButton")
-    CloseBtn.Size = UDim2.new(0, 30, 0, 30)
-    CloseBtn.Position = UDim2.new(1, -35, 0, 5)
-    CloseBtn.Text = "X"
-    CloseBtn.TextColor3 = Theme.SubText
-    CloseBtn.TextSize = 16
-    CloseBtn.Font = Enum.Font.SourceSansBold
-    CloseBtn.BackgroundTransparency = 1
-    CloseBtn.Parent = TopBar
-    CloseBtn.MouseButton1Click:Connect(function()
-        ScreenGui:Destroy()
-    end)
-    
-    -- 监听玩家游戏屏幕大小发生变化（比如手机横竖屏切换），自动重新调整位置防止出界
-    ScreenGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-        MainFrame.Position = clampToScreen(MainFrame.Position)
-    end)
+    -- 侧边栏 (带专属 X Logo)
+    local Sidebar = Instance.new("Frame", MainFrame)
+    Sidebar.Size = UDim2.new(0, 150, 1, 0)
+    Sidebar.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+    Sidebar.BorderSizePixel = 0
 
-    -- =================【下属组件创建功能保持不变】=================
-    
-    function Window:CreateLabel(text)
-        local Label = Instance.new("TextLabel")
-        Label.Size = UDim2.new(1, 0, 0, 30)
-        Label.BackgroundColor3 = Theme.NavBg
-        Label.Text = text
-        Label.TextColor3 = Theme.SubText
-        Label.TextSize = 14
-        Label.Font = Enum.Font.SourceSans
-        Label.Parent = Container
+    local MiniLogo, _, _ = CreateXLogo(Sidebar, UDim2.new(0, 40, 0, 40), UDim2.new(0, 30, 0, 30))
+    local TitleLabel = Instance.new("TextLabel", Sidebar)
+    TitleLabel.Position = UDim2.new(0, 60, 0, 10)
+    TitleLabel.Size = UDim2.new(1, -60, 0, 40)
+    TitleLabel.BackgroundTransparency = 1
+    TitleLabel.Text = titleText
+    TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TitleLabel.Font = Enum.Font.GothamBold
+    TitleLabel.TextSize = 14
+    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    local TabContainer = Instance.new("ScrollingFrame", Sidebar)
+    TabContainer.Size = UDim2.new(1, 0, 1, -60)
+    TabContainer.Position = UDim2.new(0, 0, 0, 60)
+    TabContainer.BackgroundTransparency = 1
+    TabContainer.ScrollBarThickness = 0
+    local TabListLayout = Instance.new("UIListLayout", TabContainer)
+    TabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    TabListLayout.Padding = UDim.new(0, 5)
+
+    -- 内容区
+    local ContentArea = Instance.new("Frame", MainFrame)
+    ContentArea.Size = UDim2.new(1, -150, 1, 0)
+    ContentArea.Position = UDim2.new(0, 150, 0, 0)
+    ContentArea.BackgroundTransparency = 1
+
+    local firstTab = true
+
+    function WindowData:CreateTab(tabName)
+        local TabData = {}
+
+        local TabBtn = Instance.new("TextButton", TabContainer)
+        TabBtn.Size = UDim2.new(1, 0, 0, 35)
+        TabBtn.BackgroundTransparency = 1
+        TabBtn.Text = "  " .. tabName
+        TabBtn.TextColor3 = Color3.fromRGB(150, 150, 160)
+        TabBtn.Font = Enum.Font.GothamSemibold
+        TabBtn.TextSize = 13
+        TabBtn.TextXAlignment = Enum.TextXAlignment.Left
+
+        local Page = Instance.new("ScrollingFrame", ContentArea)
+        Page.Size = UDim2.new(1, -20, 1, -20)
+        Page.Position = UDim2.new(0, 10, 0, 10)
+        Page.BackgroundTransparency = 1
+        Page.ScrollBarThickness = 2
+        Page.Visible = firstTab
         
-        local LCorner = Instance.new("UICorner")
-        LCorner.CornerRadius = UDim.new(0, 4)
-        LCorner.Parent = Label
-        
-        local function UpdateText(newText)
-            Label.Text = newText
+        local PageLayout = Instance.new("UIListLayout", Page)
+        PageLayout.Padding = UDim.new(0, 8)
+
+        if firstTab then
+            TabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            firstTab = false
         end
-        return {UpdateText = UpdateText}
+
+        TabBtn.MouseButton1Click:Connect(function()
+            for _, child in pairs(ContentArea:GetChildren()) do
+                if child:IsA("ScrollingFrame") then child.Visible = false end
+            end
+            for _, child in pairs(TabContainer:GetChildren()) do
+                if child:IsA("TextButton") then child.TextColor3 = Color3.fromRGB(150, 150, 160) end
+            end
+            Page.Visible = true
+            TabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        end)
+
+        function TabData:CreateButton(btnText, callback)
+            local Btn = Instance.new("TextButton", Page)
+            Btn.Size = UDim2.new(1, -10, 0, 35)
+            Btn.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+            Btn.Text = btnText
+            Btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+            Btn.Font = Enum.Font.Gotham
+            Btn.TextSize = 13
+            Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 4)
+
+            Btn.MouseButton1Click:Connect(function()
+                TweenService:Create(Btn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(139, 92, 246)}):Play()
+                task.wait(0.1)
+                TweenService:Create(Btn, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(25, 25, 30)}):Play()
+                pcall(callback)
+            end)
+        end
+
+        function TabData:CreateLabel(text)
+            local Lbl = Instance.new("TextLabel", Page)
+            Lbl.Size = UDim2.new(1, -10, 0, 25)
+            Lbl.BackgroundTransparency = 1
+            Lbl.Text = text
+            Lbl.TextColor3 = Color3.fromRGB(139, 92, 246)
+            Lbl.Font = Enum.Font.Code
+            Lbl.TextSize = 13
+            Lbl.TextXAlignment = Enum.TextXAlignment.Left
+            return Lbl
+        end
+
+        return TabData
     end
 
-    function Window:CreateButton(text, callback)
-        local Button = Instance.new("TextButton")
-        Button.Size = UDim2.new(1, 0, 0, 35)
-        Button.BackgroundColor3 = Theme.NavBg
-        Button.Text = text
-        Button.TextColor3 = Theme.Text
-        Button.TextSize = 14
-        Button.Font = Enum.Font.SourceSansBold
-        Button.AutoButtonColor = false
-        Button.Parent = Container
-        
-        local BCorner = Instance.new("UICorner")
-        BCorner.CornerRadius = UDim.new(0, 4)
-        BCorner.Parent = Button
-        
-        local UIStroke = Instance.new("UIStroke")
-        UIStroke.Color = Theme.Border
-        UIStroke.Thickness = 1
-        UIStroke.Parent = Button
-        
-        Button.MouseEnter:Connect(function()
-            TweenService:Create(Button, TweenInfo.new(0.2), {BackgroundColor3 = Theme.Border}):Play()
-            TweenService:Create(UIStroke, TweenInfo.new(0.2), {Color = Theme.Accent}):Play()
-        end)
-        Button.MouseLeave:Connect(function()
-            TweenService:Create(Button, TweenInfo.new(0.2), {BackgroundColor3 = Theme.NavBg}):Play()
-            TweenService:Create(UIStroke, TweenInfo.new(0.2), {Color = Theme.Border}):Play()
-        end)
-        
-        Button.MouseButton1Click:Connect(function()
-            Button.BackgroundColor3 = Theme.Accent
-            task.wait(0.05)
-            Button.BackgroundColor3 = Theme.Border
-            pcall(callback)
-        end)
-    end
-
-    return Window
+    return WindowData
 end
 
 return Library
