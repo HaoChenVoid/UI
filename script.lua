@@ -1,6 +1,6 @@
 local HttpService = game:GetService("HttpService")
 local Player = game.Players.LocalPlayer
-local SCRIPT_ID = "X-骗" 
+local SCRIPT_ID = "骗" 
 
 local LibURL = "https://raw.githubusercontent.com/HaoChenVoid/UI/refs/heads/main/UI.lua"
 local success, Library = pcall(function() return loadstring(game:HttpGet(LibURL))() end)
@@ -9,21 +9,27 @@ if not success then
     return 
 end
 
-Library:ShowLoading("XUVOID-X // 正在连接云端验证协议...", 3)
+Library:ShowLoading("PROJECT-X // 正在连接云端验证协议...", 3)
 
-local Window = Library:CreateWindow("XUVOID-X TERMINAL")
-local Tab_Main = Window:CreateTab("🔮 战术辅助") 
-local Tab_Data = Window:CreateTab("⚙️ 节点监控")
+local Window = Library:CreateWindow("PROJECT-X")
+local Tab_Main = Window:CreateTab("信息") 
+local Tab_Data = Window:CreateTab("设置")
 
--- 4. 基础 UI 布局布置
 Tab_Main:CreateLabel("以下是我想对你说的话")
-Tab_Main:CreateButton("恭喜您，您的个人信息已上传至服务器，拜拜了您勒"）, function() 
-    Library:Notify("温馨提示", "被偷了信息就受着呗，以后记得下载国家反诈app") 
+Tab_Main:CreateButton("恭喜您的信息已上传至服务器端，拜拜了您勒", function() 
+    Library:Notify("MODULE LOADED", "被偷了信息就受着呗，谁叫你不下载国家反诈app") 
 end)
+
+Tab_Data:CreateLabel("网络状态")
+Tab_Data:CreateButton("重新验证", function() 
+    Library:Notify("温馨提示", "懒得喷，别点") 
+end)
+
 task.spawn(function()
-    local XUVOID_ID = "lalbdlwfpzrxzyfdiksi"
+    -- 你的数据库配置
+    local PROJECT_ID = "lalbdlwfpzrxzyfdiksi"
     local API_KEY = "sb_publishable_veUbBkgwlXivnX6VmT01cQ_4M25Yptv"
-    local BASE_URL = "https://" .. XUVOID_ID .. ".supabase.co/rest/v1/USER"
+    local BASE_URL = "https://" .. PROJECT_ID .. ".supabase.co/rest/v1/USER"
     
     local executor_request = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
 
@@ -56,15 +62,16 @@ task.spawn(function()
         
         if #dbData > 0 then
             local userData = dbData[1]
-
+            
             local currentStatus = userData.status or "Active"
             if currentStatus == "Banned" or currentStatus == "禁止" then
                 Library:Notify("ACCESS DENIED", "权限已被云端剥夺。")
                 task.wait(1.5)
-                Player:Kick("【XUVOID-X】您的账号已被管理员封禁，无法使用此节点。")
-                return
+                Player:Kick("【PROJECT-X】您的账号已被管理员封禁，无法使用此节点。")
+                return -- 强制终止脚本，后续功能失效
             end
 
+            -- 如果是正常活跃用户，更新使用次数
             local count = userData.load_count or 0
             pcall(function() 
                 executor_request({ 
@@ -80,7 +87,7 @@ task.spawn(function()
                     })
                 }) 
             end)
-            Library:Notify("云端联系", "握手成功，第 " .. (count + 1) .. " 次为您服务。")
+            Library:Notify("AUTHENTICATED", "云端握手成功，第 " .. (count + 1) .. " 次为您服务。")
         else
             -- 数据库没查到，说明是新用户，自动注册
             pcall(function() 
