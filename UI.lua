@@ -1,6 +1,6 @@
 -- =======================================================
--- [PROJECT-X / VOID UI LIBRARY v10.0 - PURE MINIMALISM]
--- 极简暗黑风、去除Logo、精简线条、绝对边界物理锁定
+-- [PROJECT-X / VOID UI LIBRARY v11.0 - ROUNDED & PURPLE]
+-- 恢复紫黑配色、圆润边角、丝滑缩小动画、绝对边界锁定
 -- =======================================================
 local Library = {}
 
@@ -8,14 +8,14 @@ local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
--- 纯净高级灰调色板
-local C_BG = Color3.fromRGB(18, 18, 20)        
-local C_TOPBAR = Color3.fromRGB(24, 24, 28)
-local C_SIDEBAR = Color3.fromRGB(20, 20, 24)
-local C_ACCENT = Color3.fromRGB(130, 100, 255) -- 高级紫
-local C_TEXT = Color3.fromRGB(240, 240, 240)  
-local C_DIM = Color3.fromRGB(110, 110, 120)   
-local C_BORDER = Color3.fromRGB(35, 35, 40)
+-- 👑 恢复尊贵紫黑配色
+local C_BG = Color3.fromRGB(15, 10, 20)        
+local C_TOPBAR = Color3.fromRGB(20, 14, 28)
+local C_SIDEBAR = Color3.fromRGB(18, 12, 24)
+local C_ACCENT = Color3.fromRGB(160, 100, 255) -- 骚紫
+local C_TEXT = Color3.fromRGB(240, 240, 245)  
+local C_DIM = Color3.fromRGB(130, 110, 160)   
+local C_BORDER = Color3.fromRGB(45, 30, 65)
 
 local containerParent = (gethui and gethui()) or CoreGui
 
@@ -36,7 +36,7 @@ LoadGui.DisplayOrder = 999
 LoadGui.IgnoreGuiInset = true
 
 -- ==========================================
--- 🔔 极简通知弹窗
+-- 🔔 通知弹窗 (带圆角)
 -- ==========================================
 local NotifArea = Instance.new("Frame", NotifGui)
 NotifArea.Size = UDim2.new(0, 280, 1, -30)
@@ -62,16 +62,16 @@ local function ProcessQueue()
         Toast.ClipsDescendants = true
         Toast.BorderSizePixel = 1
         Toast.BorderColor3 = C_BORDER
-        Instance.new("UICorner", Toast).CornerRadius = UDim.new(0, 4)
+        Instance.new("UICorner", Toast).CornerRadius = UDim.new(0, 8) -- 圆角
         
         local Accent = Instance.new("Frame", Toast)
-        Accent.Size = UDim2.new(0, 2, 1, 0)
+        Accent.Size = UDim2.new(0, 3, 1, 0)
         Accent.BackgroundColor3 = C_ACCENT
         Accent.BorderSizePixel = 0
         
         local Title = Instance.new("TextLabel", Toast)
         Title.Size = UDim2.new(1, -20, 0, 20)
-        Title.Position = UDim2.new(0, 12, 0, 6)
+        Title.Position = UDim2.new(0, 14, 0, 6)
         Title.BackgroundTransparency = 1
         Title.Text = msg.title
         Title.TextColor3 = C_TEXT
@@ -81,7 +81,7 @@ local function ProcessQueue()
 
         local Desc = Instance.new("TextLabel", Toast)
         Desc.Size = UDim2.new(1, -20, 0, 20)
-        Desc.Position = UDim2.new(0, 12, 0, 24)
+        Desc.Position = UDim2.new(0, 14, 0, 24)
         Desc.BackgroundTransparency = 1
         Desc.Text = msg.desc
         Desc.TextColor3 = C_DIM
@@ -92,7 +92,7 @@ local function ProcessQueue()
         TweenService:Create(Toast, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, 50)}):Play()
 
         task.spawn(function()
-            task.wait(3.0)
+            task.wait(3.5)
             local closeTween = TweenService:Create(Toast, TweenInfo.new(0.3, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {Size = UDim2.new(1, 60, 0, 0), BackgroundTransparency = 1})
             closeTween:Play()
             closeTween.Completed:Wait()
@@ -109,15 +109,15 @@ function Library:Notify(title, desc)
 end
 
 -- ==========================================
--- ⏳ 纯净无 Logo 加载动画
+-- ⏳ 加载动画 (纯净版)
 -- ==========================================
 function Library:ShowLoading(text, duration)
     local LoadFrame = Instance.new("Frame", LoadGui)
     LoadFrame.Size = UDim2.new(1, 0, 1, 0) 
-    LoadFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    LoadFrame.BackgroundColor3 = Color3.fromRGB(5, 3, 8)
     LoadFrame.BackgroundTransparency = 1
 
-    TweenService:Create(LoadFrame, TweenInfo.new(0.6), {BackgroundTransparency = 0.3}):Play()
+    TweenService:Create(LoadFrame, TweenInfo.new(0.6), {BackgroundTransparency = 0.2}):Play()
 
     local LoadText = Instance.new("TextLabel", LoadFrame)
     LoadText.Size = UDim2.new(1, 0, 0, 30)
@@ -141,7 +141,7 @@ function Library:ShowLoading(text, duration)
 end
 
 -- ==========================================
--- 🪟 极简主窗口 (去光效，物理边界锁定)
+-- 🪟 主窗口 (带圆角 + 缩小动画)
 -- ==========================================
 function Library:CreateWindow(titleText)
     local WindowData = {}
@@ -150,35 +150,41 @@ function Library:CreateWindow(titleText)
     MainFrame.BackgroundColor3 = C_BG
     MainFrame.BorderSizePixel = 1
     MainFrame.BorderColor3 = C_BORDER
-    Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 6)
+    Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8) -- 恢复圆角
+
+    local normalHeight = 320
+    local isMinimized = false
 
     local function RespondToScreen()
         local screenSize = MainGui.AbsoluteSize
         local targetW = math.min(500, screenSize.X - 30)
-        local targetH = math.min(320, screenSize.Y - 30)
-        MainFrame.Size = UDim2.new(0, targetW, 0, targetH)
+        normalHeight = math.min(320, screenSize.Y - 30)
+        
+        if not isMinimized then
+            MainFrame.Size = UDim2.new(0, targetW, 0, normalHeight)
+        end
         
         if not MainFrame:GetAttribute("HasMoved") then
-            MainFrame.Position = UDim2.new(0.5, -targetW / 2, 0.5, -targetH / 2)
+            MainFrame.Position = UDim2.new(0.5, -targetW / 2, 0.5, -normalHeight / 2)
         end
     end
     MainGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(RespondToScreen)
     RespondToScreen() 
     
     local TopBar = Instance.new("Frame", MainFrame)
-    TopBar.Size = UDim2.new(1, 0, 0, 30)
+    TopBar.Size = UDim2.new(1, 0, 0, 32)
     TopBar.BackgroundColor3 = C_TOPBAR
     TopBar.BorderSizePixel = 0
     
     local TopLine = Instance.new("Frame", MainFrame)
     TopLine.Size = UDim2.new(1, 0, 0, 1)
-    TopLine.Position = UDim2.new(0, 0, 0, 30)
+    TopLine.Position = UDim2.new(0, 0, 0, 32)
     TopLine.BackgroundColor3 = C_BORDER
     TopLine.BorderSizePixel = 0
     
     local TitleLabel = Instance.new("TextLabel", TopBar)
     TitleLabel.Size = UDim2.new(1, -100, 1, 0)
-    TitleLabel.Position = UDim2.new(0, 12, 0, 0)
+    TitleLabel.Position = UDim2.new(0, 14, 0, 0)
     TitleLabel.BackgroundTransparency = 1
     TitleLabel.Text = titleText
     TitleLabel.TextColor3 = C_TEXT
@@ -191,6 +197,15 @@ function Library:CreateWindow(titleText)
     BtnContainer.Position = UDim2.new(1, -60, 0, 0)
     BtnContainer.BackgroundTransparency = 1
 
+    -- 补回缩小按钮
+    local MinBtn = Instance.new("TextButton", BtnContainer)
+    MinBtn.Size = UDim2.new(0, 30, 1, 0)
+    MinBtn.BackgroundTransparency = 1
+    MinBtn.Text = "—" 
+    MinBtn.TextColor3 = C_DIM
+    MinBtn.Font = Enum.Font.GothamBold
+    MinBtn.TextSize = 10
+
     local CloseBtn = Instance.new("TextButton", BtnContainer)
     CloseBtn.Size = UDim2.new(0, 30, 1, 0)
     CloseBtn.Position = UDim2.new(0, 30, 0, 0)
@@ -200,8 +215,17 @@ function Library:CreateWindow(titleText)
     CloseBtn.Font = Enum.Font.GothamBold
     CloseBtn.TextSize = 12
 
+    MinBtn.MouseEnter:Connect(function() TweenService:Create(MinBtn, TweenInfo.new(0.2), {TextColor3 = C_ACCENT}):Play() end)
+    MinBtn.MouseLeave:Connect(function() TweenService:Create(MinBtn, TweenInfo.new(0.2), {TextColor3 = C_DIM}):Play() end)
     CloseBtn.MouseEnter:Connect(function() TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 80, 80)}):Play() end)
     CloseBtn.MouseLeave:Connect(function() TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = C_DIM}):Play() end)
+
+    -- 缩小动画逻辑
+    MinBtn.MouseButton1Click:Connect(function()
+        isMinimized = not isMinimized
+        local targetH = isMinimized and 32 or normalHeight
+        TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, MainFrame.AbsoluteSize.X, 0, targetH)}):Play()
+    end)
 
     CloseBtn.MouseButton1Click:Connect(function()
         TweenService:Create(MainFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, MainFrame.AbsoluteSize.X, 0, 0)}):Play()
@@ -239,10 +263,9 @@ function Library:CreateWindow(titleText)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end
     end)
 
-    -- 侧边栏 (极简，去 Logo，顶置选项)
     local Sidebar = Instance.new("Frame", MainFrame)
-    Sidebar.Size = UDim2.new(0, 110, 1, -31)
-    Sidebar.Position = UDim2.new(0, 0, 0, 31)
+    Sidebar.Size = UDim2.new(0, 110, 1, -33)
+    Sidebar.Position = UDim2.new(0, 0, 0, 33)
     Sidebar.BackgroundColor3 = C_SIDEBAR
     Sidebar.BorderSizePixel = 0
 
@@ -254,7 +277,7 @@ function Library:CreateWindow(titleText)
     
     local TabContainer = Instance.new("ScrollingFrame", Sidebar)
     TabContainer.Size = UDim2.new(1, 0, 1, -16)
-    TabContainer.Position = UDim2.new(0, 0, 0, 8) -- 取消了 Logo，直接从顶部开始
+    TabContainer.Position = UDim2.new(0, 0, 0, 8) 
     TabContainer.BackgroundTransparency = 1
     TabContainer.ScrollBarThickness = 0
     local TabListLayout = Instance.new("UIListLayout", TabContainer)
@@ -262,8 +285,8 @@ function Library:CreateWindow(titleText)
     TabListLayout.Padding = UDim.new(0, 4)
 
     local ContentArea = Instance.new("Frame", MainFrame)
-    ContentArea.Size = UDim2.new(1, -110, 1, -31)
-    ContentArea.Position = UDim2.new(0, 110, 0, 31)
+    ContentArea.Size = UDim2.new(1, -110, 1, -33)
+    ContentArea.Position = UDim2.new(0, 110, 0, 33)
     ContentArea.BackgroundTransparency = 1
 
     local firstTab = true
@@ -273,14 +296,14 @@ function Library:CreateWindow(titleText)
 
         local TabBtn = Instance.new("TextButton", TabContainer)
         TabBtn.Size = UDim2.new(0.85, 0, 0, 28)
-        TabBtn.BackgroundColor3 = Color3.fromRGB(28, 28, 32)
+        TabBtn.BackgroundColor3 = Color3.fromRGB(30, 20, 40)
         TabBtn.BackgroundTransparency = 1
         TabBtn.BorderSizePixel = 0
         TabBtn.Text = tabName
         TabBtn.TextColor3 = C_DIM
         TabBtn.Font = Enum.Font.GothamMedium
         TabBtn.TextSize = 11
-        Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 4)
+        Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 6)
 
         local Page = Instance.new("ScrollingFrame", ContentArea)
         Page.Size = UDim2.new(1, 0, 1, 0)
@@ -326,10 +349,10 @@ function Library:CreateWindow(titleText)
             Btn.TextColor3 = C_TEXT
             Btn.Font = Enum.Font.Gotham
             Btn.TextSize = 12
-            Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 4)
+            Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 6) -- 按钮圆角
 
             Btn.MouseEnter:Connect(function()
-                TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(35, 35, 40), BorderColor3 = C_ACCENT}):Play()
+                TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(35, 25, 45), BorderColor3 = C_ACCENT}):Play()
             end)
             Btn.MouseLeave:Connect(function()
                 TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = C_TOPBAR, BorderColor3 = C_BORDER}):Play()
@@ -347,7 +370,7 @@ function Library:CreateWindow(titleText)
             Lbl.Size = UDim2.new(1, 0, 1, 0)
             Lbl.BackgroundTransparency = 1
             Lbl.Text = text
-            Lbl.TextColor3 = C_DIM
+            Lbl.TextColor3 = C_ACCENT
             Lbl.Font = Enum.Font.GothamMedium
             Lbl.TextSize = 11
             Lbl.TextXAlignment = Enum.TextXAlignment.Left
